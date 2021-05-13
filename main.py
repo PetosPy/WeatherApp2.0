@@ -5,7 +5,7 @@ import requests
 
 BACKGROUND_COLOR = "#a0edff"
 OWM_endpoint = ("https://api.openweathermap.org/data/2.5/weather?")
-api_key = "0281d86d8622d57c1d576cbc757bca7a"
+api_key = "Your_key"
 
 
 

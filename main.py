@@ -8,35 +8,40 @@ OWM_endpoint = ("https://api.openweathermap.org/data/2.5/weather?")
 api_key = "Your_key"
 
 
-
-
-#Getting city names from my json file to create an autocomplete when user types.
-with open("city_list.json", "r", encoding="utf8") as contents:
-    data = json.load(contents)
-    for city in data:
-        city_names = city["name"]
-
-
-
-#--------------- Fetching weather data ---------
+# Takes information that user provided.
 def data_fetcher():
 	city_name = city_input.get()
+	latitude_data = lat_input.get()
+	longitude_data = long_input.get()
+
+	# API requests parameteres
+	# If user requests data by city name then, city_parameteres is used.
+	city_parameteres = {"q": city_name, "appid": api_key, "units": "metric"}
+	# If user requests data by coordinates then, gro_parameteres is used.
+	geo_parameteres = {"lat": "32.776665", "lon": "-96.796989", "appid": api_key, "units": "metric"}
+	# Check if user entered data into the city field
 	if len(city_name) > 0:
-		city_parameteres = {"q": city_name, "appid": api_key, "units": "metric"}
-		geo_parameteres = {"lat": "32.776665", "lon": "-96.796989", "appid": api_key, "units": "metric"}
-
-		response = requests.get(OWM_endpoint, params=city_parameteres)
-		response.raise_for_status()
-
-		temp = response.json()["main"]["temp"]
-		feels_like = response.json()["main"]["feels_like"]
-		min_temp = response.json()["main"]["temp_min"]
-		max_temp = response.json()["main"]["temp_max"]
-
-		canvas.itemconfig(canvas_text, text=f"Temperature: {temp}°C\nFeels_like: {feels_like}°C\nMin_temp: {min_temp}°C\nMax_temp: {max_temp}°C")
-
+		get_weather(city_parameteres)
+	# Check if user entered data into the latitude and longitude fields
+	elif len(latitude_data) > 0 and len(longitude_data) > 0:
+		get_weather(geo_parameteres)
 	else:
+		# Error messag box if no info or wrong info was provided
 		messagebox.showinfo(title="Oops", message="Please insert a valid city name")
+
+
+#--------------- Fetching weather data ---------		
+def get_weather(parameter_data):
+	# parameter_data depends on whether the user provided the city or coordinates
+	response = requests.get(OWM_endpoint, params=parameter_data)
+	response.raise_for_status()
+
+	temp = response.json()["main"]["temp"]
+	feels_like = response.json()["main"]["feels_like"]
+	min_temp = response.json()["main"]["temp_min"]
+	max_temp = response.json()["main"]["temp_max"]
+	# Data formated with f-string to display on canvas.
+	canvas.itemconfig(canvas_text, text=f"Temperature: {temp:.0f}°C\nFeels_like: {feels_like:.0f}°C\nMin_temp: {min_temp:.0f}°C\nMax_temp: {max_temp:.0f}°C")
 
 
 #-------------- App UI ------------
